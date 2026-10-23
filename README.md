@@ -72,7 +72,7 @@ Antes de qualquer tratamento, a base bruta foi auditada no notebook [`notebooks/
 | Data em 7 formatos no mesmo campo (3) | `compras.data_publicacao` / `resultados.data_resultado` | 7 formatos em cada coluna | `converter_data` |
 | Data no padrão dia/mês/ano (3) | `compras.data_publicacao` / `resultados.data_resultado` | 501 / 3.712 | `converter_data` |
 | Data colada, sem separador (`20250103`) (3) | `compras.data_publicacao` / `resultados.data_resultado` | 106 / 923 | `converter_data` |
-| Homologação antes da publicação (3) | `resultados.data_resultado` | *(em construção: medido depois da limpeza das datas)* | regra 7 |
+| Homologação antes da publicação (3) | `resultados.data_resultado` | 234 resultados | regra 7 |
 | CNPJ com máscara (1) | `compras.cnpj_orgao` | 176 | `limpar_documento` |
 | CNPJ com zeros perdidos (12, 13 ou 11 dígitos) (1) | `compras.cnpj_orgao` | 64, 10 e 3 | `limpar_documento` (`.zfill`) |
 | CNPJ de fornecedor com zeros perdidos (13, 12 ou 11 dígitos) (1) | `resultados.ni_fornecedor`, PJ | 175, 18 e 1 | `limpar_documento` (`.zfill`) |
