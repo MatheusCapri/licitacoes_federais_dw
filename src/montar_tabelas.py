@@ -38,32 +38,27 @@ def main():
     # =========================================================================================
     # --- compras.csv ---
     # .map(funcao) aplica a funcao em cada linha da coluna.   Regra 10: o CNPJ do orgao e de pessoa juridica ("PJ")
-    # COMPLETE: o segundo argumento de limpar_documento e o tipo de pessoa; aqui e sempre "PJ"
-    compras["cnpj_orgao"] = compras["cnpj_orgao"].map(lambda v: limpeza.limpar_documento(v, ____))
-    # COMPLETE: o nome do orgao deve ser padronizado (maiusculas etc.): passe a funcao limpeza.padronizar_nome (sem parenteses)
-    compras["nome_orgao"] = compras["razao_social_orgao"].map(____)
+    compras["cnpj_orgao"] = compras["cnpj_orgao"].map(lambda v: limpeza.limpar_documento(v, "PJ"))
+    compras["nome_orgao"] = compras["razao_social_orgao"].map(limpeza.padronizar_nome)
     compras["uf_sigla"] = compras["uf_sigla"].map(limpeza.padronizar_nome)
     compras["uf_nome"] = compras["uf_nome"].map(limpeza.padronizar_nome)
     # Regra 11: o arquivo nao traz a regiao; busque no dicionario REGIAO pela sigla da UF
-    # COMPLETE: .map(REGIAO) troca cada sigla (ex.: "DF") pela regiao ("Centro-Oeste")
-    compras["regiao"] = compras["uf_sigla"].map(____)
+    compras["regiao"] = compras["uf_sigla"].map(REGIAO)
     compras["poder"] = compras["poder_id"].map(PODER).fillna("Não informado")
     compras["modalidade_id"] = compras["modalidade_id"].astype(int)
     # Regra 9: o nome da modalidade vem do codigo (modalidade_id), nao do texto do arquivo
-    # COMPLETE: use .map(MODALIDADES) na coluna modalidade_id
-    compras["nome_modalidade"] = compras["modalidade_id"].map(____)
-    # COMPLETE: converta a data de publicacao com a sua funcao limpeza.converter_data
-    compras["data_publicacao"] = compras["data_publicacao"].map(____)
+    compras["nome_modalidade"] = compras["modalidade_id"].map(MODALIDADES)
+    compras["data_publicacao"] = compras["data_publicacao"].map(limpeza.converter_data)
     compras["objeto_compra"] = compras["objeto_compra"].map(limpeza.limpar_texto)
 
     # --- itens.csv ---
     itens["descricao_item"] = itens["descricao"].map(limpeza.padronizar_nome)
     itens["material_ou_servico"] = itens["material_ou_servico"].map(limpeza.limpar_texto)
-    # Regra 12: numeros em texto -> numero. COMPLETE: use limpeza.converter_numero
+    # Regra 12: numeros em texto -> numero.
     for coluna in ["quantidade", "valor_unitario_estimado"]:
-        itens[coluna] = itens[coluna].map(____)
-    # "sigiloso" vem como texto "True"/"False". COMPLETE: compare o texto em minusculas (.str.lower()) com "true"
-    itens["sigiloso"] = itens["sigiloso"].str.lower() == ____
+        itens[coluna] = itens[coluna].map(limpeza.converter_numero)
+    # "sigiloso" vem como texto "True"/"False".
+    itens["sigiloso"] = itens["sigiloso"].str.lower() == "true"
     itens["numero_item"] = itens["numero_item"].astype(int)
 
     # --- resultados.csv ---
@@ -71,34 +66,31 @@ def main():
     resultados["nome_fornecedor"] = resultados["nome_fornecedor"].map(limpeza.padronizar_nome)
     resultados["porte"] = resultados["porte"].map(limpeza.limpar_texto)
     # O CNPJ/CPF do fornecedor depende do tipo da pessoa, que esta na coluna tipo_pessoa (PJ, PF ou PE)
-    # COMPLETE: passe o tipo da linha (a variavel tipo) como segundo argumento
-    resultados["ni_fornecedor"] = [limpeza.limpar_documento(ni, ____)
+    resultados["ni_fornecedor"] = [limpeza.limpar_documento(ni, tipo)
                                    for ni, tipo in zip(resultados["ni_fornecedor"], resultados["tipo_pessoa"])]
     for coluna in ["quantidade_homologada", "valor_unitario_homologado"]:
         resultados[coluna] = resultados[coluna].map(limpeza.converter_numero)
     resultados["data_resultado"] = resultados["data_resultado"].map(limpeza.converter_data)
-    # Resultado cancelado = a coluna data_cancelamento esta preenchida. COMPLETE: compare com o texto vazio ""
-    resultados["cancelado"] = resultados["data_cancelamento"].str.strip() != ____
+    # Resultado cancelado = a coluna data_cancelamento esta preenchida.
+    resultados["cancelado"] = resultados["data_cancelamento"].str.strip() != ""
 
     # =========================================================================================
     # ETAPA 2 - UM VENCEDOR POR ITEM  (regra 2)
     # =========================================================================================
-    # COMPLETE: fique so com os resultados que NAO estao cancelados. O til (~) inverte True/False: ~resultados["cancelado"]
-    resultados = resultados[____].copy()
-    # ordem 1 = vencedor. Quando a ordem vem vazia, ela vale 1. COMPLETE: preencha os vazios (fillna) com 1
-    resultados["ordem"] = pd.to_numeric(resultados["ordem_classificacao_srp"], errors="coerce").fillna(____)
+
+    resultados = resultados[~resultados["cancelado"]].copy()
+    # ordem 1 = vencedor. Quando a ordem vem vazia, ela vale 1.
+    resultados["ordem"] = pd.to_numeric(resultados["ordem_classificacao_srp"], errors="coerce").fillna(1)
     resultados["sequencial"] = pd.to_numeric(resultados["sequencial_resultado"], errors="coerce").fillna(1)
     # Ordena para o vencedor ficar em primeiro: por item, depois pela ordem, depois pelo sequencial (desempate)
     resultados = resultados.sort_values(["numero_controle_pncp", "numero_item", "ordem", "sequencial"])
-    # COMPLETE: mantenha so a PRIMEIRA linha de cada item. Metodo: resultados.drop_duplicates([colunas que identificam o item])
-    resultados = resultados.____(["numero_controle_pncp", "numero_item"])
+    resultados = resultados.drop_duplicates(["numero_controle_pncp", "numero_item"])
 
     # =========================================================================================
     # ETAPA 3 - JUNTAR OS 3 ARQUIVOS: SO ENTRAM ITENS COM RESULTADO  (regra 3)
     # =========================================================================================
     # merge junta tabelas pelas colunas em comum. how="inner" fica so com o que existe nos DOIS lados.
-    # COMPLETE: escreva how="inner" na primeira junção (itens que nao tem resultado ficam de fora)
-    fato = itens.merge(resultados, on=["numero_controle_pncp", "numero_item"], how=____)
+    fato = itens.merge(resultados, on=["numero_controle_pncp", "numero_item"], how="inner")
     fato = fato.merge(compras, on="numero_controle_pncp")
     print(f"Itens com resultado, antes de rejeitar: {len(fato)}")
 
