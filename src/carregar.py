@@ -33,7 +33,7 @@ def inserir(con, tabela, colunas, dados):
     """Monta o INSERT INTO ... VALUES (%s, %s, ...) e envia todas as linhas de uma vez."""
     marcadores = ", ".join(["%s"] * len(colunas))
     sql = f"INSERT INTO {tabela} ({', '.join(colunas)}) VALUES ({marcadores})"
-    banco.inserir_em_lote(con, sql, tuplas(dados, colunas))
+    banco.inserir_em_lote(con, sql, tuplas(dados, colunas), confirmar=False)
     print(f"   {tabela}: {len(dados)} linhas")
 
 
@@ -45,23 +45,32 @@ def main():
     con = banco.conectar()
 
     # 2) Dimensoes PRIMEIRO: a fato tem chave estrangeira para elas, entao elas precisam existir antes.
-    print("Carga:")
-    for nome, colunas in [("dim_orgao", ["sk_orgao", "cnpj_orgao", "nome_orgao", "poder"]),
-                          ("dim_fornecedor", ["sk_fornecedor", "ni_fornecedor", "nome_fornecedor", "tipo_pessoa", "porte"]),
-                          ("dim_modalidade", ["sk_modalidade", "modalidade_id", "nome_modalidade"]),
-                          ("dim_localidade", ["sk_localidade", "uf_sigla", "uf_nome", "regiao"])]:
-        # dtype=str: o CNPJ nao pode perder o zero da esquerda ao ser lido
-        inserir(con, nome, colunas, ler(nome, dtype=str))
+    try:
+        print("Carga:")
+        for nome, colunas in [("dim_orgao", ["sk_orgao", "cnpj_orgao", "nome_orgao", "poder"]),
+                            ("dim_fornecedor", ["sk_fornecedor", "ni_fornecedor", "nome_fornecedor", "tipo_pessoa", "porte"]),
+                            ("dim_modalidade", ["sk_modalidade", "modalidade_id", "nome_modalidade"]),
+                            ("dim_localidade", ["sk_localidade", "uf_sigla", "uf_nome", "regiao"])]:
+            # dtype=str: o CNPJ nao pode perder o zero da esquerda ao ser lido
+            inserir(con, nome, colunas, ler(nome, dtype=str))
 
-    # 3) Fato (depois das dimensoes)
-    fato = ler("fato_item_contratado")
-    # dias_ciclo vem como 48.0 (decimal) porque tem vazios; o banco quer inteiro.
-    fato["dias_ciclo"] = fato["dias_ciclo"].astype("Int64")
-    colunas = ["numero_controle_pncp", "numero_item", "sk_orgao", "sk_fornecedor", "sk_modalidade", "sk_localidade",
-               "data_publicacao", "data_homologacao", "descricao_item", "perfil_gasto", "quantidade",
-               "valor_unitario_estimado", "valor_total_estimado", "valor_unitario_homologado", "valor_total_homologado",
-               "comparavel", "economia_valor", "dias_ciclo"]
-    inserir(con, "fato_item_contratado", colunas, fato)
+        # 3) Fato (depois das dimensoes)
+        fato = ler("fato_item_contratado")
+        # dias_ciclo vem como 48.0 (decimal) porque tem vazios; o banco quer inteiro.
+        fato["dias_ciclo"] = fato["dias_ciclo"].astype("Int64")
+        colunas = ["numero_controle_pncp", "numero_item", "sk_orgao", "sk_fornecedor", "sk_modalidade", "sk_localidade",
+                "data_publicacao", "data_homologacao", "descricao_item", "perfil_gasto", "quantidade",
+                "valor_unitario_estimado", "valor_total_estimado", "valor_unitario_homologado", "valor_total_homologado",
+                "comparavel", "economia_valor", "dias_ciclo"]
+        inserir(con, "fato_item_contratado", colunas, fato)
+
+        con.commit()
+        print("Carga confirmada (commit).")
+    except Exception as erro:
+        con.rollback()
+        con.close()
+        print(f"ERRO na carga: nada foi gravado (rollback). Detalhe: {erro}")
+        raise
 
     # 4) Conferencia: o que esta no banco tem que bater com a prova real (anexo 8 do enunciado)
     print("Conferencia:")
