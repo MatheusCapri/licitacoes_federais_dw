@@ -1,5 +1,5 @@
 """
-montar_tabelas.py  -  DOS CSVs BRUTOS ATE A FATO E AS 4 DIMENSOES   (voce completa os trechos com ____)
+montar_tabelas.py  -  DOS CSVs BRUTOS ATE A FATO E AS 4 DIMENSOES
 ========================================================================================================
 Aqui voce usa as funcoes do src/limpeza.py e aplica as regras de negocio do enunciado (secao 4.2), UMA ETAPA POR VEZ.
 Cada etapa tem o numero da regra. O que vem depois de "COMPLETE:" explica o que fazer.
@@ -99,11 +99,9 @@ def main():
     # =========================================================================================
     # Usa-se a quantidade HOMOLOGADA, tanto no estimado quanto no homologado, para a comparacao ser justa.
     qtd_homologada = fato["quantidade_homologada"]
-    # COMPLETE: .where(condicao, outro) mantem o valor onde a condicao e verdadeira e usa "outro" onde e falsa.
-    # Queremos a quantidade homologada quando ela for maior que 0; senao a quantidade do item. Condicao: qtd_homologada > 0
-    fato["quantidade"] = qtd_homologada.where(____, fato["quantidade"])
-    # COMPLETE: valor total estimado = valor unitario estimado x quantidade (round(2) arredonda em centavos)
-    fato["valor_total_estimado"] = (____).round(2)
+    # Queremos a quantidade homologada quando ela for maior que 0;
+    fato["quantidade"] = qtd_homologada.where(qtd_homologada > 0, fato["quantidade"])
+    fato["valor_total_estimado"] = (fato["valor_unitario_estimado"] * fato["quantidade"]).round(2)
     fato["valor_total_homologado"] = (fato["valor_unitario_homologado"] * fato["quantidade"]).round(2)
 
     # =========================================================================================
@@ -113,19 +111,15 @@ def main():
     # Dica: ~(coluna > 0) e verdadeiro quando o valor e <= 0 OU esta vazio (NaN). Os sinais: | = "ou"
     rejeitado = (
         ~(fato["quantidade"] > 0)                          # quantidade vazia ou <= 0
-        # COMPLETE: valor unitario ESTIMADO ausente ou <= 0
-        | ____
+        | ~(fato["valor_unitario_estimado"] > 0)   
         | ~(fato["valor_unitario_homologado"] > 0)         # valor unitario homologado ausente ou <= 0
         | fato["sigiloso"]                                 # orcamento sigiloso
-        # COMPLETE: valor total estimado menor que R$ 1  (use est)
-        | ____
-        # COMPLETE: valor total homologado mais de 1000 vezes o estimado (use hom e est)
-        | ____
+        | (est < 1)
+        | (hom > 1000 * est)  
         | (est > 1e12) | (hom > 1e12)                      # valores acima de R$ 1 trilhao (estouram o DECIMAL do banco)
     )
     print(f"Itens rejeitados (nao entram na fato): {rejeitado.sum()}   (prova real: 99)")
-    # COMPLETE: fique so com os itens NAO rejeitados (use ~rejeitado)
-    fato = fato[____].copy()
+    fato = fato[~rejeitado].copy()
 
     # =========================================================================================
     # ETAPA 6 - COMPARAVEL E ECONOMIA  (regra 6)
@@ -133,24 +127,19 @@ def main():
     est, hom = fato["valor_total_estimado"], fato["valor_total_homologado"]
     razao = hom / est
     # Comparavel = NAO e Credenciamento (modalidade 12) E a razao homologado/estimado esta entre 0,1 e 10.
-    # COMPLETE: modalidade diferente de 12;  razao.between(0.1, 10) ja esta escrito logo depois
-    fato["comparavel"] = ((fato["modalidade_id"] != ____) & razao.between(____)).astype(int)
-    # Economia = estimado - homologado, so nos itens comparaveis (nos demais vale 0)
-    # COMPLETE: estimado menos homologado (use est e hom)
-    fato["economia_valor"] = (____).where(fato["comparavel"] == 1, 0.0).round(2)
+    fato["comparavel"] = ((fato["modalidade_id"] != 12) & razao.between(0.1, 10)).astype(int)
+        # Economia = estimado - homologado, so nos itens comparaveis (nos demais fica vazia: enunciado 4.3)
+    fato["economia_valor"] = (est - hom).where(fato["comparavel"] == 1, None).round(2)
 
     # =========================================================================================
     # ETAPA 7 - CRONOLOGIA  (regra 7)
     # =========================================================================================
     fato["data_homologacao"] = fato["data_resultado"]
     # Homologar ANTES de publicar e impossivel: a data de homologacao vira vazia (o item continua na fato)
-    # COMPLETE: antes = a data de homologacao e menor que a data de publicacao
-    antes = ____
-    # COMPLETE: nas linhas "antes", coloque None (vazio) na data de homologacao
-    fato.loc[antes, "data_homologacao"] = ____
+    antes = (fato["data_homologacao"] < fato["data_publicacao"])
+    fato.loc[antes, "data_homologacao"] = None
     # ciclo = dias entre a publicacao e a homologacao (so quando existe homologacao)
-    # COMPLETE: subtrair duas datas da um "intervalo"; o numero de dias esta em .days
-    fato["dias_ciclo"] = [(h - p).____ if h is not None and not pd.isna(h) else None
+    fato["dias_ciclo"] = [(h - p).days if h is not None and not pd.isna(h) else None
                           for h, p in zip(fato["data_homologacao"], fato["data_publicacao"])]
 
     # =========================================================================================
@@ -160,28 +149,25 @@ def main():
     texto = fato["descricao_item"].fillna("") + " " + fato["objeto_compra"].fillna("").str.upper()
     eh_obra = texto.str.contains(r"\b(?:OBRAS?|CONSTRUÇÃO|CONSTRUCAO|REFORMA|ENGENHARIA)\b", regex=True)
     fato["perfil_gasto"] = "Bens"
-    # COMPLETE: se o campo material_ou_servico comeca com "SERVI" (Servico), o perfil e "Serviços"
-    fato.loc[fato["material_ou_servico"].fillna("").str.upper().str.startswith(____), "perfil_gasto"] = "Serviços"
+    fato.loc[fato["material_ou_servico"].fillna("").str.upper().str.startswith("SERVI"), "perfil_gasto"] = "Serviços"
     # COMPLETE: nas linhas eh_obra, o perfil e "Obras e engenharia"
-    fato.loc[eh_obra, "perfil_gasto"] = ____
+    fato.loc[eh_obra, "perfil_gasto"] = "Obras e engenharia"
 
     # =========================================================================================
     # ETAPA 9 - AS 4 DIMENSOES, COM CHAVE SUBSTITUTA (sk_)  (secao 4.3 do enunciado)
     # =========================================================================================
     # Cada dimensao tem UMA linha por valor distinto da chave natural, e a coluna sk_ numera as linhas (1, 2, 3...).
-    # dim_orgao: e o EXEMPLO pronto. Leia como funciona e repita o raciocinio nas outras tres.
+
     dim_orgao = fato.drop_duplicates("cnpj_orgao")[["cnpj_orgao", "nome_orgao", "poder"]].reset_index(drop=True)
     dim_orgao.insert(0, "sk_orgao", dim_orgao.index + 1)
 
     fato["ni_fornecedor"] = fato["ni_fornecedor"].fillna("NAO-INFORMADO")
-    # COMPLETE: uma linha por fornecedor: drop_duplicates pela chave natural "ni_fornecedor"
-    dim_fornecedor = fato.____("ni_fornecedor")[["ni_fornecedor", "nome_fornecedor", "tipo_pessoa", "porte"]].reset_index(drop=True)
+    dim_fornecedor = fato.drop_duplicates("ni_fornecedor")[["ni_fornecedor", "nome_fornecedor", "tipo_pessoa", "porte"]].reset_index(drop=True)
     dim_fornecedor.insert(0, "sk_fornecedor", dim_fornecedor.index + 1)
-    # COMPLETE: uma linha por modalidade: drop_duplicates pela chave natural "modalidade_id"
-    dim_modalidade = fato.drop_duplicates(____)[["modalidade_id", "nome_modalidade"]].reset_index(drop=True)
+    dim_modalidade = fato.drop_duplicates("modalidade_id")[["modalidade_id", "nome_modalidade"]].reset_index(drop=True)
     dim_modalidade.insert(0, "sk_modalidade", dim_modalidade.index + 1)
     # COMPLETE: uma linha por UF: drop_duplicates pela chave natural "uf_sigla"
-    dim_localidade = fato.drop_duplicates(____)[["uf_sigla", "uf_nome", "regiao"]].reset_index(drop=True)
+    dim_localidade = fato.drop_duplicates("uf_sigla")[["uf_sigla", "uf_nome", "regiao"]].reset_index(drop=True)
     dim_localidade.insert(0, "sk_localidade", dim_localidade.index + 1)
 
     # Troca a chave natural (CNPJ, sigla...) pela chave substituta (sk_) dentro da fato.
@@ -189,7 +175,7 @@ def main():
     for dim, chave, sk in [(dim_orgao, "cnpj_orgao", "sk_orgao"), (dim_fornecedor, "ni_fornecedor", "sk_fornecedor"),
                            (dim_modalidade, "modalidade_id", "sk_modalidade"), (dim_localidade, "uf_sigla", "sk_localidade")]:
         # COMPLETE: fato[sk] recebe a coluna chave da fato trocada pelo dicionario: fato[chave].map(dict(zip(dim[chave], dim[sk])))
-        fato[sk] = ____
+        fato[sk] = fato[chave].map(dict(zip(dim[chave], dim[sk])))
 
     colunas = ["numero_controle_pncp", "numero_item", "sk_orgao", "sk_fornecedor", "sk_modalidade", "sk_localidade",
                "data_publicacao", "data_homologacao", "descricao_item", "perfil_gasto", "quantidade",
