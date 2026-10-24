@@ -93,7 +93,7 @@ Antes de qualquer tratamento, a base bruta foi auditada no notebook [`notebooks/
 
 ## Decisões técnicas
 
-*(em construção)*
+- **Economia vazia nos itens não comparáveis:** o código do kit (`src/montar_tabelas.py`, etapa 6) gravava `economia_valor = 0` nos itens não comparáveis, mas o enunciado (seção 4.3) pede que esse campo fique vazio. A regra foi mantida; o que mudou foi o código, para seguir o enunciado. O zero diria "não houve economia"; o vazio diz "não é possível calcular" (como num credenciamento). O percentual de economia não muda, porque só soma os itens comparáveis.
 
 ## Perguntas de negócio
 
