@@ -94,6 +94,9 @@ Antes de qualquer tratamento, a base bruta foi auditada no notebook [`notebooks/
 ## Decisões técnicas
 
 - **Economia vazia nos itens não comparáveis:** o código do kit (`src/montar_tabelas.py`, etapa 6) gravava `economia_valor = 0` nos itens não comparáveis, mas o enunciado (seção 4.3) pede que esse campo fique vazio. A regra foi mantida; o que mudou foi o código, para seguir o enunciado. O zero diria "não houve economia"; o vazio diz "não é possível calcular" (como num credenciamento). O percentual de economia não muda, porque só soma os itens comparáveis.
+- **Carga em uma transação só:** o kit gravava (commit) cada tabela separadamente; se a fato falhasse, as dimensões ficariam no banco sem a fato. A função `inserir_em_lote` (`src/banco.py`) ganhou o parâmetro `confirmar`, e o `src/carregar.py` passou a dar um único commit no fim, com rollback se qualquer etapa falhar. Teste: com o nome da fato trocado de propósito, a carga falhou e a `dim_orgao` ficou com 0 linhas no banco.
+- **Sem CHECK na economia:** a fato recusa quantidade ≤ 0 e valores negativos, mas `economia_valor` pode ser negativa: são os itens com sobrepreço (homologado acima do estimado), uma informação que a Controladoria precisa ver.
+- **Sem linha −1 "Não informado":** todas as chaves estrangeiras da fato encontraram a sua linha nas dimensões (a carga com as FKs ativas não recusou nenhum item), então a linha −1 não foi necessária, como prevê o enunciado (4.3).
 
 ## Perguntas de negócio
 
