@@ -100,8 +100,6 @@ Antes de qualquer tratamento, a base bruta foi auditada no notebook [`notebooks/
 
 ## Perguntas de negócio
 
-## Perguntas de negócio
-
 As consultas estão em [`sql/02_perguntas.sql`](sql/02_perguntas.sql), cada uma com o resultado e a leitura logo abaixo. Os números das perguntas 1, 4 e 6 conferem com a prova real do enunciado (seção 8).
 
 **Termos usados:** *volume* é a soma do valor total homologado de todos os itens da fato. *Economia* (ou *deságio*) é o estimado menos o homologado, calculada só nos itens comparáveis (regra 6), e o percentual é a soma da economia dividida pela soma do estimado comparável.
