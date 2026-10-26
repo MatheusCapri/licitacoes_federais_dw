@@ -100,7 +100,97 @@ Antes de qualquer tratamento, a base bruta foi auditada no notebook [`notebooks/
 
 ## Perguntas de negócio
 
-*(em construção)*
+## Perguntas de negócio
+
+As consultas estão em [`sql/02_perguntas.sql`](sql/02_perguntas.sql), cada uma com o resultado e a leitura logo abaixo. Os números das perguntas 1, 4 e 6 conferem com a prova real do enunciado (seção 8).
+
+**Termos usados:** *volume* é a soma do valor total homologado de todos os itens da fato. *Economia* (ou *deságio*) é o estimado menos o homologado, calculada só nos itens comparáveis (regra 6), e o percentual é a soma da economia dividida pela soma do estimado comparável.
+
+### P1. Qual é o percentual e o valor economizado pelo governo?
+
+| Indicador | Valor |
+|---|---|
+| Estimado da base comparável | R$ 6.867.663.469,91 |
+| Economia | R$ 992.861.686,95 |
+| Economia % | 14,46% |
+
+**Conclusão:** nos itens em que a comparação é possível, o governo pagou 14,46% abaixo do estimado, uma economia de R$ 992.861.686,95.
+
+### P2. Quem são os maiores fornecedores e quanto do orçamento está concentrado neles?
+
+| # | Fornecedor | Volume | % do volume |
+|---|---|---|---|
+| 1 | NOW SEGUROS SA | R$ 1.060.000.000,00 | 13,18% |
+| 2 | CONSTRUTORA CIDADE LIMITADA | R$ 524.935.394,97 | 6,53% |
+| 3 | BANCO BRADESCO S.A. | R$ 379.194.320,07 | 4,71% |
+| 4 | CONSTRUTORA NORTE BRASIL LTDA. | R$ 335.401.470,80 | 4,17% |
+| 5 | LCM CONSTRUCAO E COMERCIO S.A | R$ 228.885.493,53 | 2,85% |
+
+Os 10 maiores juntos concentram **41,43%** do volume (ranking completo no arquivo SQL).
+
+**Conclusão:** a concentração é alta: 10 dos 2.652 fornecedores ficam com 41,43% do volume, e o maior, sozinho, com 13,18%. Seis dos dez maiores são construtoras ou empresas de engenharia. Para a Controladoria, isso é um risco de dependência: um problema com poucos fornecedores afeta uma parte grande das compras públicas.
+
+### P3. Quais modalidades economizam mais e quais concentram mais volume?
+
+| Modalidade | Volume | % do volume | Economia % |
+|---|---|---|---|
+| Concorrência - Eletrônica | R$ 4.700.493.122,98 | 58,43% | 14,27% |
+| Credenciamento | R$ 2.141.301.557,16 | 26,62% | (não se aplica) |
+| Pregão - Eletrônico | R$ 502.223.491,28 | 6,24% | 24,02% |
+| Concorrência - Presencial | R$ 444.752.757,18 | 5,53% | 6,79% |
+| Inexigibilidade | R$ 213.365.238,19 | 2,65% | 8,77% |
+| Dispensa | R$ 39.887.350,44 | 0,50% | 4,49% |
+| Pregão - Presencial | R$ 2.475.288,51 | 0,03% | 0,02% |
+
+**Conclusão:** a Concorrência Eletrônica concentra o volume (58,43%), com economia próxima da média geral (14,27%). O Pregão Eletrônico é a modalidade que mais economiza (24,02%, quase o dobro da média), mesmo com apenas 6,24% do volume. O Credenciamento movimenta 26,62% do volume, mas não tem economia mensurável (regra 6): mais de um quarto do dinheiro passa por uma modalidade em que o desconto não pode ser medido. O Pregão Presencial tem volume pequeno demais (0,03%) para conclusões.
+
+### P4. Qual o tempo médio entre a publicação do edital e a homologação, por órgão?
+
+**Visão geral:** ciclo médio de **48,1 dias**, máximo de **611 dias**, 5.896 itens com ciclo e 230 sem ciclo (homologação anterior à publicação, anulada pela regra 7).
+
+Os 5 órgãos mais lentos (com 5 ou mais itens com ciclo, agrupados pelo nome):
+
+| Órgão | Itens com ciclo | Ciclo médio (dias) | Ciclo máximo (dias) |
+|---|---|---|---|
+| UNIVERSIDADE FEDERAL DE CAMPINA GRANDE | 16 | 266,3 | 309 |
+| CONSELHO FEDERAL DE ENGENHARIA E AGRONOMIA | 20 | 223,0 | 223 |
+| DNIT - DEPARTAMENTO NACIONAL DE INFRAEST DE TRANSPORTES | 62 | 156,2 | 437 |
+| UNIVERSIDADE FEDERAL DO ESTADO DO RIO DE JANEIRO | 26 | 135,4 | 176 |
+| INSTITUTO FEDERAL DE EDUCACAO,CIENCIA E TECNOLOGIA DE RONDONIA | 9 | 125,0 | 226 |
+
+**Conclusão:** os 10 órgãos mais lentos têm ciclo médio de 100 dias ou mais, mais que o dobro da média geral. Seis deles são universidades ou institutos federais. Ponto de atenção: a média é calculada por item, então uma única compra lenta com muitos itens pesa muito no ranking. No Conselho Federal de Engenharia e Agronomia, por exemplo, o ciclo médio é igual ao máximo (223 dias): todos os 20 itens tiveram o mesmo ciclo, provavelmente por virem da mesma compra.
+
+### P5. Quais estados e regiões concentram mais despesa e quais têm melhores descontos?
+
+| Região | Unidades compradoras | Volume | % do volume | Economia % |
+|---|---|---|---|---|
+| Centro-Oeste | 107 | R$ 3.559.879.991,73 | 44,25% | 17,02% |
+| Nordeste | 106 | R$ 1.850.420.285,02 | 23,00% | 14,18% |
+| Sudeste | 120 | R$ 1.083.309.811,49 | 13,47% | 11,62% |
+| Sul | 65 | R$ 1.021.624.955,41 | 12,70% | 7,96% |
+| Norte | 59 | R$ 529.263.762,09 | 6,58% | 21,43% |
+
+Por estado (tabela completa com as 27 UFs no arquivo SQL):
+
+| UF | Volume | % do volume | Economia % |
+|---|---|---|---|
+| DF | R$ 3.135.638.456,35 | 38,98% | 15,90% |
+| RS | R$ 820.584.056,64 | 10,20% | 7,18% |
+| RJ | R$ 461.925.602,27 | 5,74% | 11,57% |
+| PI | R$ 408.389.525,89 | 5,08% | 5,98% |
+| SP | R$ 393.783.392,48 | 4,90% | 9,22% |
+
+**Conclusão:** o Centro-Oeste concentra quase metade do volume (44,25%), puxado pelo Distrito Federal (38,98%), sede da maior parte dos órgãos federais, e ainda tem economia acima da média (17,02%). O maior desconto regional é o do Norte (21,43%), justamente a região com menos volume (6,58%), e o menor é o do Sul (7,96%). Entre os estados, os maiores descontos são do Acre (26,71%), de Mato Grosso (25,84%) e da Bahia (25,01%). O Rio Grande do Sul é o 2º em volume, mas tem um dos menores descontos (7,18%). Estados com volume muito pequeno, como Amapá e Tocantins (0,10% cada), têm percentuais pouco confiáveis: uma única compra muda o resultado. Observação: a UF vem da compra, e uma mesma unidade compradora pode ter compras em mais de uma UF, por isso as unidades das regiões não devem ser somadas.
+
+### P6. Como os recursos se distribuem entre bens, serviços e obras?
+
+| Perfil | Itens | Volume | % do volume | Ticket médio por item |
+|---|---|---|---|---|
+| Obras e engenharia | 967 | R$ 4.892.362.732,70 | 60,8% | R$ 5.059.320,30 |
+| Serviços | 1.849 | R$ 2.940.950.885,18 | 36,6% | R$ 1.590.562,94 |
+| Bens | 3.310 | R$ 211.185.187,86 | 2,6% | R$ 63.802,17 |
+
+**Conclusão:** obras e engenharia têm a menor quantidade de itens e a maior fatia do dinheiro (60,8%): poucos contratos, de valor muito alto. Bens são mais da metade dos itens, mas só 2,6% do volume. Para a Controladoria, fiscalizar poucas obras cobre a maior parte do dinheiro público, o que combina com a P2, em que seis dos dez maiores fornecedores são construtoras.
 
 ## Planejamento em Sprints
 
