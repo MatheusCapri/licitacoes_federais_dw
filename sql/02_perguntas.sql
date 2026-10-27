@@ -5,13 +5,14 @@ USE pncp_controladoria;
 
 -- P1. Qual e o percentual e o valor economizado pelo governo?
 SELECT
+    SUM(valor_total_homologado) AS volume_homologado,
     SUM(CASE WHEN comparavel = 1 THEN valor_total_estimado ELSE 0 END) AS estimado_comparavel,
     SUM(economia_valor)                                                     AS economia_rs,
     ROUND(100 * SUM(economia_valor)
           / SUM(CASE WHEN comparavel = 1 THEN valor_total_estimado ELSE 0 END), 2) AS economia_pct
 FROM fato_item_contratado;
 
--- Resultado: estimado comparavel R$ 6.867.663.469,91 | economia R$ 992.861.686,95 | 14,46%
+-- Resultado: estimado comparavel R$ 6.867.663.469,91 | volume homologado R$ 8.044.498.805,74 | economia R$ 992.861.686,95 | 14,46%
 -- (confere com a prova real, secao 8)
 
 
