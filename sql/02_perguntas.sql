@@ -6,14 +6,20 @@ USE pncp_controladoria;
 -- P1. Qual e o percentual e o valor economizado pelo governo?
 SELECT
     SUM(valor_total_homologado) AS volume_homologado,
+	SUM(comparavel)                            AS itens_comparaveis,
+    COUNT(*)                                   AS total_itens,
+    ROUND(100 * SUM(comparavel) / COUNT(*), 2) AS pct_comparaveis,
     SUM(CASE WHEN comparavel = 1 THEN valor_total_estimado ELSE 0 END) AS estimado_comparavel,
     SUM(economia_valor)                                                     AS economia_rs,
     ROUND(100 * SUM(economia_valor)
           / SUM(CASE WHEN comparavel = 1 THEN valor_total_estimado ELSE 0 END), 2) AS economia_pct
 FROM fato_item_contratado;
 
--- Resultado: estimado comparavel R$ 6.867.663.469,91 | volume homologado R$ 8.044.498.805,74 | economia R$ 992.861.686,95 | 14,46%
--- (confere com a prova real, secao 8)
+/*
+Resultado: 
+
+volume_homologado		itens_comparaveis		total_itens		pct_comparaveis		economia_rs			estimado_comparavel		economia_pct
+8044498805.74			5457					6126			89.08				6867663469.91		992861686.95			14.46
 
 
 
@@ -73,23 +79,29 @@ SELECT
     ROUND(100 * SUM(f.valor_total_homologado)
           / (SELECT SUM(valor_total_homologado) FROM fato_item_contratado), 2) AS pct_volume,
     ROUND(100 * SUM(f.economia_valor)
-          / NULLIF(SUM(CASE WHEN f.comparavel = 1 THEN f.valor_total_estimado ELSE 0 END), 0), 2) AS economia_pct
+          / NULLIF(SUM(CASE WHEN f.comparavel = 1 THEN f.valor_total_estimado ELSE 0 END), 0), 2) AS economia_pct,
+    ROUND(
+        100 * SUM(f.economia_valor)
+            / NULLIF(SUM(CASE WHEN f.comparavel = 1 THEN f.valor_total_estimado ELSE 0 END), 0)
+        - (SELECT 100 * SUM(economia_valor)
+                  / SUM(CASE WHEN comparavel = 1 THEN valor_total_estimado ELSE 0 END)
+           FROM fato_item_contratado),
+    1) AS desagio_vs_media_pp
 FROM fato_item_contratado f
 JOIN dim_modalidade m ON f.sk_modalidade = m.sk_modalidade
 GROUP BY m.sk_modalidade, m.nome_modalidade
 ORDER BY volume DESC;
-
 /*
 Resultados:
 
-nome_modalidade					volume				pct_volume		economia_pct
-Concorrência - Eletrônica		4700493122.98		58.43			14.27
-Credenciamento					2141301557.16		26.62			
-Pregão - Eletrônico				502223491.28		6.24			24.02
-Concorrência - Presencial		444752757.18		5.53			6.79
-Inexigibilidade					213365238.19		2.65			8.77
-Dispensa						39887350.44			0.50			4.49
-Pregão - Presencial				2475288.51			0.03			0.02
+nome_modalidade					volume				pct_volume		economia_pct	desagio_vs_media_pp
+Concorrência - Eletrônica		4700493122.98		58.43			14.27			-0.2
+Credenciamento					2141301557.16		26.62							
+Pregão - Eletrônico				502223491.28		6.24			24.02			9.6
+Concorrência - Presencial		444752757.18		5.53			6.79			-7.7
+Inexigibilidade					213365238.19		2.65			8.77			-5.7
+Dispensa						39887350.44			0.50			4.49			-10.0
+Pregão - Presencial				2475288.51			0.03			0.02			-14.4
 
 - Pregão - Eletrônico, com 24,02% é a modalidade que mais economiza (quase o dobro da média), mesmo tendo um volume de apenas 6,24%.
 - O maior volume é de Concorrência Eletrônica, com 58,43% de volume e economia de 14,27%
