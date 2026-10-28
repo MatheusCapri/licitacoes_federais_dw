@@ -264,10 +264,14 @@ TO			TOCANTINS					12							7885397.89			0.10			17.80
 SELECT
     perfil_gasto,
     COUNT(*)                     AS itens,
+    ROUND(100 * COUNT(*)
+          / (SELECT COUNT(*) FROM fato_item_contratado), 2) AS pct_itens,
     SUM(valor_total_homologado)  AS volume,
     ROUND(100 * SUM(valor_total_homologado)
           / (SELECT SUM(valor_total_homologado) FROM fato_item_contratado), 1) AS pct_volume,
-    ROUND(SUM(valor_total_homologado) / COUNT(*), 2) AS ticket_medio
+    ROUND(SUM(valor_total_homologado) / COUNT(*), 2) AS ticket_medio,
+    ROUND(100 * SUM(economia_valor)
+          / NULLIF(SUM(CASE WHEN comparavel = 1 THEN valor_total_estimado ELSE 0 END), 0), 2) AS economia_pct
 FROM fato_item_contratado
 GROUP BY perfil_gasto
 ORDER BY volume DESC;
@@ -276,10 +280,10 @@ ORDER BY volume DESC;
 
 Resultados:
 
-perfil_gasto			itens		volume				pct_volume		ticket_medio
-Obras e engenharia		967			4892362732.70		60.8			5059320.30
-Serviços				1849		2940950885.18		36.6			1590562.94
-Bens					3310		211185187.86		2.6				63802.17
+perfil_gasto			itens		pct_itens		volume				pct_volume		ticket_medio		economia_pct
+Obras e engenharia		967			15.79			4892362732.70		60.8			5059320.30			14.17
+Serviços				1849		30.18			2940950885.18		36.6			1590562.94			16.11
+Bens					3310		54.03			211185187.86		2.6				63802.17			14.19
 
 - Obras e engenharia: a menor quantidade de itens e a maior fatia do dinheiro. Poucos contratos, de valor muito alto.
 - Bens: mais da metade dos itens da fato, e só 2,6% do volume. Muitas compras pequenas.
