@@ -300,7 +300,34 @@ Por estado (tabela completa com as 27 UFs no arquivo SQL):
 
 ## Planejamento em Sprints
 
-*(em construção)*
+A ferramenta utilizada para as Sprints é o TickTick, em quadro Kanban.
+
+**Como ler o quadro:**
+
+- 📅: período planejado para a Sprint.
+- 🎯: objetivo da Sprint (Definition of Done).
+- A data embaixo de cada cartão é a conclusão real de cada tarefa.
+
+![Sprints do projeto](docs/img/sprints.png)
+
+| Sprint | Objetivo | Planejado | Concluída em | Situação |
+|---|---|---|---|---|
+| S0 - Planejamento | Repositório público no ar e ambiente rodando | 20/10 | 20/10 | no prazo |
+| S1 - Auditoria | Cada sujeira dos 3 CSVs contada e anotada no README | 20 a 21/10 | 23/10 | 2 dias depois |
+| S2 - Limpeza | Autoteste da limpeza com 54 de 54 certos | 21 a 22/10 | 23/10 | 1 dia depois |
+| S3 - Tabelas | Fato e dimensões batendo com a prova real | 23 a 24/10 | 23/10 | 1 dia antes |
+| S4 - Banco | Banco carregado, contagens certas e zero FK solta | 25/10 | 24/10 | 1 dia antes |
+| S5 - Perguntas | As 6 perguntas respondidas em SQL | 26/10 | 26/10 | no prazo |
+| S6 - Power BI | Dashboard com as 6 histórias e os mesmos números do SQL | 27 a 29/10 | 28/10 | 1 dia antes |
+| S7 - Entrega | Projeto reproduzível só lendo o README e vídeo gravado | 30 a 31/10 | em andamento | a definir |
+
+**Retrospectiva:**
+
+- A S1 e a S2 atrasaram em relação ao planejado. O atraso veio principalmente da S1, uma etapa de conhecimento dos dados, com muitos códigos e conferências. O ideal seria ter separado ao menos um dia a mais para ela. A S2 durou o tempo planejado, mas já começou atrasada por causa da S1.
+- A S3 se desenvolveu de forma bem mais rápida e terminou um dia antes, recuperando o atraso e ainda adiantando o projeto.
+- A conferência com a prova real funcionou como Definition of Done: cada Sprint só fechava com o número batendo, o que evitou retrabalho nas etapas seguintes.
+- Ao longo do projeto, ficou claro que as primeiras etapas pedem mais tempo que as seguintes, principalmente pelo desconhecimento dos dados: ainda não se sabe o "quão sujos" eles estão.
+
 
 ## Melhorias futuras
 
