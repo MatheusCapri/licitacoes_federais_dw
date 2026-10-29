@@ -1,7 +1,6 @@
 # Licitações Federais 2025: pipeline de dados e data warehouse de compras públicas
 
-> * Projeto em construção. As seções marcadas como *(em construção)* serão preenchidas ao longo das Sprints.
-> 🚧 Falta apenas o vídeo de apresentação, que será incluído na seção Vídeo.
+> * Falta apenas o vídeo de apresentação, que será incluído na seção Vídeo.
 
 ## Contexto
 
