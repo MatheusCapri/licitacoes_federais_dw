@@ -90,7 +90,19 @@ O notebook `notebooks/01_auditoria.ipynb` reproduz o diagnóstico da origem e n�
 
 ## Arquitetura
 
-*(em construção)*
+CSV brutos (PNCP) → limpeza e modelagem (Python) → MySQL (modelo estrela) → perguntas (SQL) e dashboard (Power BI)
+
+| Etapa | Arquivo | Entrada | Saída |
+|---|---|---|---|
+| Auditoria | `notebooks/01_auditoria.ipynb` | `data/raw/` (3 CSVs) | o diagnóstico da origem (contagens dos problemas) |
+| Limpeza | `src/limpeza.py` | cada valor de texto, número, data ou documento | o valor limpo (funções usadas pela modelagem, conferidas pelo autoteste) |
+| Modelagem | `src/montar_tabelas.py` | `data/raw/` (3 CSVs) | `data/processed/` (4 dimensões e 1 fato em CSV) |
+| Criação do banco | `sql/01_criar_banco.sql` | (executado pelo `carregar.py`) | o banco `pncp_controladoria` com as 5 tabelas vazias, chaves e CHECKs |
+| Carga | `src/carregar.py` (com `src/banco.py` e `src/config.py`) | `data/processed/` e as credenciais do `.env` | as 5 tabelas carregadas no MySQL, com a conferência das contagens |
+| Perguntas | `sql/02_perguntas.sql` | o banco MySQL | as respostas das 6 perguntas de negócio |
+| Dashboard | `powerbi/licitacoes_federais_2025.pbix` | o banco MySQL (importado) | as 6 páginas do dashboard |
+
+A auditoria mede os problemas e o pipeline os corrige: cada problema do diagnóstico tem o seu tratamento indicado na coluna "Como é tratado" do dicionário das inconsistências.
 
 ## Modelo dimensional
 
