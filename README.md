@@ -198,6 +198,8 @@ Por estado (tabela completa com as 27 UFs no arquivo SQL):
 
 - **Documentos de fornecedores estrangeiros:** a função `limpar_documento` do kit não altera documentos de estrangeiros (`tipo_pessoa = PE`), além de limpar espaços. Com isso, `ESTRANG0002421` e `ES.TRA.NG0/0024-21` continuam diferentes e o mesmo fornecedor pode aparecer duas vezes. São 21 linhas; a regra foi mantida, como pede o enunciado, e a melhoria fica registrada aqui.
 
+- **Números de documento no nome do fornecedor:** alguns fornecedores, normalmente microempreendedores, têm número de documento no nome (a raiz do CNPJ no início ou o CPF no fim), já que a razão social está registrada assim. A função `padronizar_nome` do kit não elimina os números, e a regra foi mantida, como pede o enunciado. Isso não duplica fornecedores, porque a dimensão é montada pelo documento. Apesar de a base ser pública, retirar do nome esses números, que já estão em `ni_fornecedor`, seguiria melhor o princípio da necessidade da LGPD e evitaria que o CPF aparecesse no dashboard.
+
 ## Vídeo
 
 *(em construção)*
