@@ -35,7 +35,7 @@ licitacoes_federais_dw/
 ├── powerbi/                # dashboard
 ├── reports/                # logs e relatórios gerados pelo pipeline
 └── docs/
-    └── img/                # figuras do README (Sprints, modelo dimensional)
+    └── img/                # figuras do README (Sprints, modelo dimensional) e prints das 6 páginas do dashboard
 ```
 
 ## Como executar
