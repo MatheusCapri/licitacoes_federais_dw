@@ -347,4 +347,4 @@ Portal Nacional de Contratações Públicas (PNCP), contratações federais de 2
 ## Autor
 
 **Matheus Capri**
-[LinkedIn](https://www.linkedin.com/in/matheus-capri-nery-215a3737) · [GitHub](https://github.com/MatheusCapri)
+[LinkedIn](https://www.linkedin.com/in/matheus-capri-nery) · [GitHub](https://github.com/MatheusCapri)
