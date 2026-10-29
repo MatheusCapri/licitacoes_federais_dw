@@ -43,7 +43,19 @@ licitacoes_federais_dw/
 
 ## Modelo dimensional
 
-*(em construção)*
+![Modelo estrela](docs/img/modelo_estrela.png)
+
+**Grão:** uma linha por item contratado, com o seu fornecedor vencedor.
+
+| Tabela | Linhas | Chave natural | O que guarda |
+|---|---|---|---|
+| `fato_item_contratado` | 6.126 | `numero_controle_pncp` + `numero_item` | os valores de cada item: quantidade, valor estimado e homologado, economia e dias de ciclo, além das chaves das 4 dimensões |
+| `dim_orgao` | 363 | `cnpj_orgao` | quem comprou: CNPJ, nome do órgão e poder |
+| `dim_fornecedor` | 2.652 | `ni_fornecedor` | quem vendeu: documento, nome, tipo de pessoa e porte da empresa |
+| `dim_modalidade` | 7 | `modalidade_id` | como foi comprado: código e nome da modalidade |
+| `dim_localidade` | 27 | `uf_sigla` | onde foi comprado: sigla e nome da UF e região |
+
+**Chaves:** todas as tabelas têm uma chave natural, mas as ligações usam uma chave substituta (`sk_`, de *surrogate key*): um número inteiro sequencial, mais simples e leve para os JOINs do que um CNPJ em texto ou a chave de duas colunas da fato. A chave natural continua em cada dimensão com UNIQUE, que impede o mesmo órgão, fornecedor, modalidade ou UF de entrar duas vezes.
 
 ## Diagnóstico da origem
 
