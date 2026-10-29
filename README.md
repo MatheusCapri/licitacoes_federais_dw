@@ -33,7 +33,7 @@ licitacoes_federais_dw/
 ├── src/                    # scripts Python do pipeline (limpeza, montagem das tabelas, carga)
 ├── sql/                    # criação do banco e perguntas de negócio
 ├── powerbi/                # dashboard
-├── reports/                # logs e relatórios gerados pelo pipeline
+├── reports/                # reservada para relatórios do pipeline (não usada nesta versão)
 └── docs/
     └── img/                # figuras do README (Sprints, modelo dimensional) e prints das 6 páginas do dashboard
 ```
