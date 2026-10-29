@@ -1,6 +1,7 @@
 # Licitações Federais 2025: pipeline de dados e data warehouse de compras públicas
 
 > * Projeto em construção. As seções marcadas como *(em construção)* serão preenchidas ao longo das Sprints.
+> 🚧 Falta apenas o vídeo de apresentação, que será incluído na seção Vídeo.
 
 ## Contexto
 
@@ -17,6 +18,7 @@ O projeto entrega um pipeline de ponta a ponta com a base de 2025, dos três CSV
 - Power BI Desktop
 - Git e GitHub
 - VS Code com Jupyter (notebook de auditoria)
+- TickTick (planejamento das Sprints em quadro Kanban)
 
 ## Estrutura do repositório
 
