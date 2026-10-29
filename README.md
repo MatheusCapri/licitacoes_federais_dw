@@ -35,7 +35,58 @@ licitacoes_federais_dw/
 
 ## Como executar
 
-*(em construção)*
+1. **Pré-requisitos:** Python 3.10 ou mais recente, MySQL 8.0 (com o MySQL Workbench), Power BI Desktop e Git.
+
+2. **Baixar o projeto:** clonar o repositório e entrar na pasta.
+
+   ```bash
+   git clone https://github.com/MatheusCapri/licitacoes_federais_dw.git
+   cd licitacoes_federais_dw
+   ```
+
+3. **Ambiente:** criar o ambiente virtual, ativá-lo (comando do Git Bash no Windows) e instalar as bibliotecas.
+
+   ```bash
+   python -m venv .venv
+   source .venv/Scripts/activate
+   pip install -r requirements.txt
+   ```
+
+4. **Credenciais:** copiar o modelo e, no arquivo `.env`, trocar `sua_senha_aqui` pela senha do MySQL. O `.env` não vai para o GitHub (está no `.gitignore`).
+
+   ```bash
+   cp .env.example .env
+   ```
+
+5. **Testar a limpeza:** rodar o autoteste das funções de `src/limpeza.py`.
+
+   ```bash
+   python -m src.limpeza
+   ```
+
+   Resultado esperado: `54 de 54 exemplos certos`.
+
+6. **Montar as tabelas:** limpar a base e montar a fato e as dimensões. O script cria a pasta `data/processed` e grava as tabelas nela.
+
+   ```bash
+   python -m src.montar_tabelas
+   ```
+
+   Resultado esperado: a conferência com a prova real do enunciado.
+
+7. **Carregar no MySQL:** criar o banco, carregar as tabelas e conferir as contagens.
+
+   ```bash
+   python -m src.carregar
+   ```
+
+   Resultado esperado: `Carga confirmada (commit).` e as 5 contagens com `OK`.
+
+8. **Perguntas de negócio:** abrir e rodar no MySQL Workbench o `sql/02_perguntas.sql` e, para conferir a carga, o `sql/03_conferencia_carga.sql`.
+
+9. **Dashboard:** abrir o `powerbi/licitacoes_federais_2025.pbix`. Os dados já vêm importados no arquivo; para atualizá-los a partir do banco local, é preciso ter o conector MySQL instalado e apontar a fonte de dados para o seu `localhost`.
+
+O notebook `notebooks/01_auditoria.ipynb` reproduz o diagnóstico da origem e não é necessário para rodar o pipeline.
 
 ## Arquitetura
 
@@ -56,6 +107,16 @@ licitacoes_federais_dw/
 | `dim_localidade` | 27 | `uf_sigla` | onde foi comprado: sigla e nome da UF e região |
 
 **Chaves:** todas as tabelas têm uma chave natural, mas as ligações usam uma chave substituta (`sk_`, de *surrogate key*): um número inteiro sequencial, mais simples e leve para os JOINs do que um CNPJ em texto ou a chave de duas colunas da fato. A chave natural continua em cada dimensão com UNIQUE, que impede o mesmo órgão, fornecedor, modalidade ou UF de entrar duas vezes.
+
+**Leitura do diagrama:**
+
+- 🔑 chave amarela: chave primária (`sk_`)
+- 🔶 losango vermelho: chave estrangeira, as quatro `sk_` da fato
+- 🔷 losango azul cheio: coluna obrigatória (NOT NULL)
+- ◇ losango vazio: coluna que aceita vazio, como `data_homologacao`, `economia_valor` e `dias_ciclo`
+
+As colunas que aceitam vazio são intencionais: `economia_valor` fica vazia nos itens não comparáveis (ver Decisões técnicas) e `dias_ciclo` fica vazio nos 230 itens sem ciclo válido (regra 7).
+
 
 ## Diagnóstico da origem
 
