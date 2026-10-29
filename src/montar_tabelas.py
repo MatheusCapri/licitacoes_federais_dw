@@ -119,7 +119,26 @@ def main():
         | (est > 1e12) | (hom > 1e12)                      # valores acima de R$ 1 trilhao (estouram o DECIMAL do banco)
     )
     print(f"Itens rejeitados (nao entram na fato): {rejeitado.sum()}   (prova real: 99)")
+
+        # Motivos da rejeicao (regra 4): conta so o PRIMEIRO motivo de cada item, na ordem do enunciado
+    motivos = [
+        ("quantidade vazia ou <= 0",                    ~(fato["quantidade"] > 0)),
+        ("valor unitario estimado ausente ou <= 0",     ~(fato["valor_unitario_estimado"] > 0)),
+        ("valor unitario homologado ausente ou <= 0",   ~(fato["valor_unitario_homologado"] > 0)),
+        ("orcamento sigiloso",                          fato["sigiloso"]),
+        ("valor total estimado < R$ 1",                 (est < 1)),
+        ("homologado mais de 1.000x o estimado",        (hom > 1000 * est)),
+        ("valor acima de R$ 1 trilhao",                 (est > 1e12) | (hom > 1e12)),
+    ]
+    ja_contado = pd.Series(False, index=fato.index)    # ninguem foi contado ainda
+    for motivo, condicao in motivos:
+        n = (condicao & ~ja_contado).sum()                    # cai neste motivo E ainda nao foi contado
+        print(f"   {motivo}: {n}")
+        ja_contado = ja_contado | condicao                 # marca quem caiu neste motivo
+
     fato = fato[~rejeitado].copy()
+
+
 
     # =========================================================================================
     # ETAPA 6 - COMPARAVEL E ECONOMIA  (regra 6)

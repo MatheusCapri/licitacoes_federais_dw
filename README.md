@@ -180,6 +180,25 @@ Antes de qualquer tratamento, a base bruta foi auditada no notebook [`notebooks/
 - **O porte da empresa falta em quase um terço dos resultados** (30,8%), escrito de 10 jeitos diferentes. Sem a limpeza, o "sem informação" seriam 10 categorias falsas.
 - **Acento quebrado em colunas que viram dimensão** (`municipio`, `nome_unidade`, `nome_fornecedor`) duplicaria registros: `Brasília` e `BrasÃ­lia` seriam vistos como dois municípios diferentes.
 
+### Itens rejeitados (regra 4)
+
+Dos 6.225 itens com resultado, 99 foram rejeitados por dados impossíveis e não entram na fato, que fica com 6.126.
+Cada item foi contado só no primeiro motivo em que caiu, na ordem do enunciado.
+
+| Motivo (primeiro encontrado) | Itens |
+|---|---|
+| Quantidade vazia ou ≤ 0 | 1 |
+| Valor unitário estimado ausente ou ≤ 0 | 23 |
+| Valor unitário homologado ausente ou ≤ 0 | 6 |
+| Orçamento sigiloso | 0 |
+| Valor total estimado < R$ 1 | 59 |
+| Homologado mais de 1.000x o estimado | 7 |
+| Valor acima de R$ 1 trilhão | 3 |
+| **Total** | **99** |
+
+- A contagem vem de `python -m src.montar_tabelas`, etapa 5, impressa ao rodar -m src.montar_tabelas.
+- O orçamento sigiloso aparece com 0 porque nenhum item teve o sigilo como primeiro motivo.
+
 ## Decisões técnicas
 
 - **Economia vazia nos itens não comparáveis:** o código do kit (`src/montar_tabelas.py`, etapa 6) gravava `economia_valor = 0` nos itens não comparáveis, mas o enunciado (seção 4.3) pede que esse campo fique vazio. A regra foi mantida; o que mudou foi o código, para seguir o enunciado. O zero diria "não houve economia"; o vazio diz "não é possível calcular" (como num credenciamento). O percentual de economia não muda, porque só soma os itens comparáveis.
