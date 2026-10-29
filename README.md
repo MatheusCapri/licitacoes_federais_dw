@@ -4,7 +4,11 @@
 
 ## Contexto
 
-*(em construção)*
+A Controladoria identificou gargalos importantes nas compras e contratações públicas federais: indícios de sobrepreço, concentração de contratos em poucos fornecedores, baixa competição em algumas modalidades e demora entre a publicação do edital e o fechamento da compra. As seis perguntas de negócio respondem a esses problemas: P1 mede o sobrepreço, P2 a concentração, P3 a competição por modalidade e P4 a demora do processo; P5 e P6 mostram onde e em que o dinheiro é gasto.
+
+O desafio parte de uma base do PNCP (Portal Nacional de Contratações Públicas) oriunda de sistemas sem validação: documentos corrompidos, dinheiro e datas em formatos variados e cronogramas impossíveis, como homologações anteriores à publicação do edital. Por isso, os relatórios gerados a partir desses dados não são confiáveis.
+
+O projeto entrega um pipeline de ponta a ponta com a base de 2025, dos três CSVs brutos até o dashboard: auditoria, limpeza em Python, modelo estrela no MySQL, 6 perguntas em SQL e o dashboard no Power BI. Os principais resultados: R$ 8,04 bilhões homologados, economia de 14,46% nos itens comparáveis e 41,43% do volume concentrado nos 10 maiores fornecedores.
 
 ## Ferramentas
 
