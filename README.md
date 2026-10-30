@@ -319,7 +319,7 @@ A ferramenta utilizada para as Sprints é o TickTick, em quadro Kanban.
 | S4 - Banco | Banco carregado, contagens certas e zero FK solta | 25/10 | 24/10 | 1 dia antes |
 | S5 - Perguntas | As 6 perguntas respondidas em SQL | 26/10 | 26/10 | no prazo |
 | S6 - Power BI | Dashboard com as 6 histórias e os mesmos números do SQL | 27 a 29/10 | 28/10 | 1 dia antes |
-| S7 - Entrega | Projeto reproduzível só lendo o README e vídeo gravado | 30 a 31/10 | em andamento | a definir |
+| S7 - Entrega | Projeto reproduzível só lendo o README e vídeo gravado | 30 a 31/10 | 30/10 | 1 dia antes |
 
 **Retrospectiva:**
 
@@ -337,7 +337,7 @@ A ferramenta utilizada para as Sprints é o TickTick, em quadro Kanban.
 
 ## Vídeo
 
-https://drive.google.com/file/d/1jNte_yoHv3DUoKX2taBXY5c3K4OT_FbI/view?usp=sharing 
+[Assistir à apresentação no Google Drive](https://drive.google.com/file/d/1jNte_yoHv3DUoKX2taBXY5c3K4OT_FbI/view?usp=sharing)
 
 ## Fonte dos dados
 
