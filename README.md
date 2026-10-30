@@ -1,6 +1,5 @@
 # Licitações Federais 2025: pipeline de dados e data warehouse de compras públicas
 
-> * Falta apenas o vídeo de apresentação, que será incluído na seção Vídeo.
 
 ## Contexto
 
@@ -338,7 +337,7 @@ A ferramenta utilizada para as Sprints é o TickTick, em quadro Kanban.
 
 ## Vídeo
 
-*(em construção)*
+https://drive.google.com/file/d/1jNte_yoHv3DUoKX2taBXY5c3K4OT_FbI/view?usp=sharing 
 
 ## Fonte dos dados
 
